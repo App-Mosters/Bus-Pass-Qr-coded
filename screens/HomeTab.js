@@ -7,7 +7,7 @@ const HomeTab = () => {
     const [pickerMode, setPickerMode] = useState(null);
     const [inline, setInline] = useState(false);
     const [location, setLocation]= useState('');
-    //const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+    
 
     
       const showDateTimePicker = () => {
@@ -19,7 +19,6 @@ const HomeTab = () => {
       };
     
       const handleConfirm = (date,time) => {
-        // In order to prevent the double-shown popup bug on Android, picker has to be hidden first (https://github.com/react-native-datetimepicker/datetimepicker/issues/54#issuecomment-618776550)
         hidePicker();
         console.warn("A date has been picked: ", date);
         console.warn("A time has been picked: ", time);

@@ -1,31 +1,28 @@
-import { StyleSheet, Text, View,
-  TouchableOpacity,Image, ImageBackground, BackHandler,
-  Linking} from 'react-native';
-import React,{Component,Fragment} from 'react';
+import React,{} from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ProfileTab from './ProfileTab';
 import HomeTab from './HomeTab';
 import QrSCAN from './QrSCAN';
+import Wallet from './Wallet';
 
 const Home = () => {
     const Tab = createBottomTabNavigator();
 
     function HomeScreen() {
         return (
-          //Home screen code
+          //Home screen 
           <HomeTab/>
 
         );
       }
       
-      function Wallet() {
+      function Wallets() {
         return (
           //wallet screen code
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text>Wallet!</Text>
-          </View>
+
+          <Wallet/>
+         
         );
       }
 
@@ -39,13 +36,13 @@ const Home = () => {
       }
 
 
-      function Profile() {
+      function Profiletab() {
         return (
           //profile screen code
           //<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             //<Text>Profile!</Text>
           //</View>
-          <ProfileTab/ >
+          <ProfileTab/>
         );
       }
 
@@ -65,7 +62,7 @@ const Home = () => {
           }} />
         <Tab.Screen 
         name="Wallet" 
-        component={Wallet} 
+        component={Wallets} 
         options={{
         tabBarLabel: 'Wallet',
           tabBarIcon: ({ color, size }) => (
@@ -86,7 +83,7 @@ const Home = () => {
 
         <Tab.Screen 
         name="Profile" 
-        component={Profile} 
+        component={Profiletab} 
         options={{
           tabBarLabel: 'Profile',
             tabBarIcon: ({ color, size }) => (
