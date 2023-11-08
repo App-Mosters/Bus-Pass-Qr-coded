@@ -14,7 +14,7 @@ import { BarCodeScanner } from 'expo-barcode-scanner';
     })()
   }
 
-  // Request Camera Permission
+  // Request Camera Permissions
   useEffect(() => {
     askForCameraPermission();
   }, []);
