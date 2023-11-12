@@ -1,12 +1,35 @@
 import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { auth } from '../firebase';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigation = useNavigation();
+
+  useEffect(() =>  {
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if (user){
+        navigation.replace("Bus Mate")
+
+      }
+    })
+
+    return unsubscribe
+  }, [])
+
+
+  const handleSignIn = () => {
+    auth
+    .signInWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      console.log('Successfully signed in:',user.email);
+    })
+    .catch((error) => alert(error.message));
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -42,11 +65,11 @@ const SignIn = () => {
         />
       </View>
 
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate("ForgotPasswordInitiate")}>
         <Text style={styles.forgot_button}>Forgot Password?</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate("Bus Mate")} style={styles.SignInbtn}>
+      <TouchableOpacity onPress={handleSignIn} style={styles.SignInbtn}>
         <Text style={styles.SignInText}>Sign In</Text>
       </TouchableOpacity>
 

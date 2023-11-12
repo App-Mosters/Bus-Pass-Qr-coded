@@ -19,7 +19,7 @@ const Home = () => {
       
       function Wallets() {
         return (
-          //wallet screen codings
+          //wallet screen code
 
           <Wallet/>
          

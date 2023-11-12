@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View,SafeAreaView,TextInput,TouchableOpacity,Image } from 'react-native';
 import React,{useState} from 'react';
 import { useNavigation } from '@react-navigation/native';
+import { auth } from '../firebase';
 
 
 
@@ -11,6 +12,23 @@ const SignUp = () => {
     const [password, setPassword] = useState('');
     const [confirmpassword, setConfirmpassword] = useState('');
     const navigation = useNavigation();
+
+    const handleSignUp = () => {
+      if (password !== confirmpassword) {
+        alert("Passwords do not match");
+        return;
+      }
+    
+      auth
+        .createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          console.log('Successfully created a new account:',user.email);
+        })
+        .catch((error) => alert(error.message));
+    };
+    
+
   return (
     <SafeAreaView style={styles.container}>
         <Image style={styles.image} source={require("../assets/Welcome.gif")} />
@@ -62,7 +80,7 @@ const SignUp = () => {
         /> 
         </View>
 
-        <TouchableOpacity onPress={() => navigation.navigate("Bus Mate")}style={styles.SignUpbtn}>
+        <TouchableOpacity onPress={handleSignUp}style={styles.SignUpbtn}>
           <Text style={styles.SignUpText}>Sign Up</Text>
         </TouchableOpacity>
     </SafeAreaView>

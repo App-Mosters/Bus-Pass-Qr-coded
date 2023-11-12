@@ -1,7 +1,22 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { View, Text, StyleSheet, Image,TouchableOpacity } from 'react-native';
+import { auth } from '../firebase';
 
 const ProfileTab = () => {
+
+  const navigation = useNavigation();
+  const handleLogout = () => {
+    auth
+    .signOut()
+    .then(()=> {
+      console.log("logged out");
+      navigation.replace("Sign In")
+      
+    })
+    .catch(error => alert(error.message))
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -10,12 +25,15 @@ const ProfileTab = () => {
         <Text style={styles.location}>Colombo, Sri Lanka </Text>
       </View>
       <View style={styles.info}>
-        <Text style={styles.label}>Email:</Text>
-        <Text style={styles.value}>User@gmail.com</Text>
+        <Text style={styles.label}>Email:  {auth.currentUser?.email}</Text>
         <Text style={styles.label}>Phone:</Text>
         <Text style={styles.value}>(+94) </Text>
         <Text style={styles.label}>Bio:</Text>
         <Text style={styles.value}>Enter Bio</Text>
+
+        <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+          <Text style={styles.logoutButtonText}>Log Out</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -56,6 +74,17 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 16,
     marginBottom: 20,
+  },
+  logoutButton: {
+    backgroundColor: '#E6C700',
+    borderRadius: 25,
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  logoutButtonText: {
+    fontWeight: 'bold',
   },
 });
 
