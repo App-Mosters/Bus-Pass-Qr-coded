@@ -1,75 +1,75 @@
-import { StyleSheet, Text, View,SafeAreaView ,TextInput,Image,TouchableOpacity} from 'react-native'
-import React,{useState} from 'react';
-import DateTimePickerModal from "react-native-modal-datetime-picker";
-
+import { StyleSheet, Text, View, SafeAreaView, TextInput, Image, TouchableOpacity,Button, Switch, Platform } from 'react-native'
+import React, { useState } from 'react';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { StatusBar } from 'expo-status-bar';
 
 const HomeTab = () => {
-    const [pickerMode, setPickerMode] = useState(null);
-    const [inline, setInline] = useState(false);
-    const [location, setLocation]= useState('');
-    
+  const [date, setDate] = useState(new Date());
+  const [show, setShow] = useState(false);
+  const [mode, setMode] = useState('date');
 
-    
-      const showDateTimePicker = () => {
-        setPickerMode("datetime");
-      };
-    
-      const hidePicker = () => {
-        setPickerMode(null);
-      };
-    
-      const handleConfirm = (date,time) => {
-        hidePicker();
-        console.warn("A date has been picked: ", date);
-        console.warn("A time has been picked: ", time);
-      };
+  const onChange = (e, selectedDate) => {
+    setDate(selectedDate);
+    setShow(false);
+  };
+
+  const showMode = (modeToShow) => {
+    setShow(true);
+    setMode(modeToShow);
+
+  }
 
 
   return (
     <SafeAreaView style={styles.container}>
-        <Image style={styles.image} source={require("../assets/bus.png")} />
-      
+      <Image style={styles.image} source={require("../assets/bus.png")} />
+
       <View style={styles.inputcontainer}>
         <View style={styles.InputView}>
-            <TextInput
-              style={styles.TextInput}
-              placeholder="Location"
-              placeholderTextColor="#003f5c"
-              onChangeText={(location) => setLocation(location)}
-            /> 
+          <TextInput
+            style={styles.TextInput}
+            placeholder="Location"
+            placeholderTextColor="#003f5c"
+            onChangeText={(location) => setLocation(location)}
+          />
+        </View>
+        <View style={styles.pickDateView}>
+          <TouchableOpacity style={styles.pickDateButton} onPress={() => showMode("date")}>
+            {show && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={date}
+                mode={mode}
+                is24Hour={true}
+                //display="default"
+                onChange={onChange}
+              />
+            )}
+          
+            <Text>Select Date</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.pickDateButton} onPress={() => showMode("time")}>
+          
+            <Text>Select Time</Text>
+          </TouchableOpacity>
+          
+          <StatusBar style="auto" />
+        </View>
+        <View>
+        <Text>{date.toLocaleString()}</Text>
         </View>
 
-        <View style={styles.datePicker}>
-            <TouchableOpacity  onPress={showDateTimePicker}style={styles.pickDateButton}>
-                <Text style={styles.pickDateText}>Select Date and Time</Text>
-            </TouchableOpacity>
-           
-            {Platform.OS === "ios" && (
-            <View style={styles.inlineSwitchContainer}>
-                <Text style={styles.inlineSwitchText}>Display inline?</Text>
-               <Switch value={inline} onValueChange={setInline} />
-            </View>
-            )}
-            <DateTimePickerModal
-            isVisible={pickerMode !== null}
-            mode={pickerMode}
-            onConfirm={handleConfirm}
-            onCancel={hidePicker}
-            display={inline ? "inline" : undefined}
-            />
-        </View>
+        
 
         <TouchableOpacity style={styles.SearchBtn}>
-            <Text style={styles.SearchBtnText}>Search</Text>
+          <Text style={styles.SearchBtnText}>Search</Text>
         </TouchableOpacity>
-     </View>
-      
-      
+      </View>
     </SafeAreaView>
-  )
+  );
 }
 
-export default HomeTab
+export default HomeTab;
 
 const styles = StyleSheet.create({
     container: {
@@ -119,9 +119,16 @@ const styles = StyleSheet.create({
         //flex:1,
 
       },
-      pickDateButton: {
+      pickDateView: {
         width: "100%",
-        borderRadius: 1,
+        itemsAlign: "center",
+        justifyContent: "center",
+        marginLeft: "70%",
+      
+      },
+      pickDateButton: {
+        width: "30%",
+        borderRadius: 25,
         height: 50,
         alignItems: "center",
         justifyContent: "center",
@@ -137,7 +144,7 @@ const styles = StyleSheet.create({
         height: 50,
         alignItems: "center",
         justifyContent: "center",
-        marginTop: 5,
+        marginTop: 40,
         marginBottom:10,
         backgroundColor: "#E6C700",
       },
