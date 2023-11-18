@@ -1,35 +1,40 @@
-import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { auth } from '../firebase';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Image,
+  TouchableOpacity,
+} from "react-native";
+import React, { useEffect, useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+import { auth } from "../firebase";
 
 const SignIn = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigation = useNavigation();
 
-  useEffect(() =>  {
-    const unsubscribe = auth.onAuthStateChanged(user => {
-      if (user){
-        navigation.replace("Bus Mate")
-
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        navigation.replace("Bus Mate");
       }
-    })
+    });
 
-    return unsubscribe
-  }, [])
-
+    return unsubscribe;
+  }, []);
 
   const handleSignIn = () => {
     auth
-    .signInWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
-      console.log('Successfully signed in:',user.email);
-    })
-    .catch((error) => alert(error.message));
-  }
+      .signInWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        console.log("Successfully signed in:", user.email);
+      })
+      .catch((error) => alert(error.message));
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -37,7 +42,10 @@ const SignIn = () => {
 
       <View style={styles.SignUp}>
         <Text style={styles.SignUpQ}>Don't have an Account? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate("Sign Up")} style={styles.SignUpBtn}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Sign Up")}
+          style={styles.SignUpBtn}
+        >
           <Text style={styles.SignUpTxt}> SignUp</Text>
         </TouchableOpacity>
       </View>
@@ -65,23 +73,24 @@ const SignIn = () => {
         />
       </View>
 
-      <TouchableOpacity onPress={() => navigation.navigate("ForgotPasswordInitiate")}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate("ForgotPasswordInitiate")}
+      >
         <Text style={styles.forgot_button}>Forgot Password?</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={handleSignIn} style={styles.SignInbtn}>
         <Text style={styles.SignInText}>Sign In</Text>
       </TouchableOpacity>
-
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
   },
 
   image: {
@@ -95,17 +104,17 @@ const styles = StyleSheet.create({
   },
 
   SignUpBtn: {
-    alignItems: 'center',
+    alignItems: "center",
   },
 
   SignUpTxt: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 
   inputView: {
     backgroundColor: "#fff",
-    borderBottomStyle: 'solid',
+    borderBottomStyle: "solid",
     borderBottomWidth: 1,
     width: "70%",
     height: 45,
@@ -138,9 +147,8 @@ const styles = StyleSheet.create({
   },
 
   SignInText: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
-
 });
 
 export default SignIn;
