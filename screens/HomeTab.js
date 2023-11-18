@@ -1,149 +1,158 @@
-import { StyleSheet, Text, View,SafeAreaView ,TextInput,Image,TouchableOpacity} from 'react-native'
-import React,{useState} from 'react';
-import DateTimePickerModal from "react-native-modal-datetime-picker";
-
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  TextInput,
+  Image,
+  TouchableOpacity,
+  Button,
+  Switch,
+  Platform,
+} from "react-native";
+import React, { useState } from "react";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { StatusBar } from "expo-status-bar";
 
 const HomeTab = () => {
-    const [pickerMode, setPickerMode] = useState(null);
-    const [inline, setInline] = useState(false);
-    const [location, setLocation]= useState('');
-    
+  const [date, setDate] = useState(new Date());
+  const [show, setShow] = useState(false);
+  const [mode, setMode] = useState("date");
 
-    
-      const showDateTimePicker = () => {
-        setPickerMode("datetime");
-      };
-    
-      const hidePicker = () => {
-        setPickerMode(null);
-      };
-    
-      const handleConfirm = (date,time) => {
-        hidePicker();
-        console.warn("A date has been picked: ", date);
-        console.warn("A time has been picked: ", time);
-      };
+  const onChange = (e, selectedDate) => {
+    setDate(selectedDate);
+    setShow(false);
+  };
 
+  const showMode = (modeToShow) => {
+    setShow(true);
+    setMode(modeToShow);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-        <Image style={styles.image} source={require("../assets/bus.png")} />
-      
+      <Image style={styles.image} source={require("../assets/bus.png")} />
+
       <View style={styles.inputcontainer}>
         <View style={styles.InputView}>
-            <TextInput
-              style={styles.TextInput}
-              placeholder="Location"
-              placeholderTextColor="#003f5c"
-              onChangeText={(location) => setLocation(location)}
-            /> 
+          <TextInput
+            style={styles.TextInput}
+            placeholder="Location"
+            placeholderTextColor="#003f5c"
+            onChangeText={(location) => setLocation(location)}
+          />
         </View>
-
-        <View style={styles.datePicker}>
-            <TouchableOpacity  onPress={showDateTimePicker}style={styles.pickDateButton}>
-                <Text style={styles.pickDateText}>Select Date and Time</Text>
-            </TouchableOpacity>
-           
-            {Platform.OS === "ios" && (
-            <View style={styles.inlineSwitchContainer}>
-                <Text style={styles.inlineSwitchText}>Display inline?</Text>
-               <Switch value={inline} onValueChange={setInline} />
-            </View>
+        <View style={styles.pickDateView}>
+          <TouchableOpacity
+            style={styles.pickDateButton}
+            onPress={() => showMode("date")}
+          >
+            {show && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={date}
+                mode={mode}
+                is24Hour={true}
+                //display="default"
+                onChange={onChange}
+              />
             )}
-            <DateTimePickerModal
-            isVisible={pickerMode !== null}
-            mode={pickerMode}
-            onConfirm={handleConfirm}
-            onCancel={hidePicker}
-            display={inline ? "inline" : undefined}
-            />
+
+            <Text>Select Date</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.pickDateButton}
+            onPress={() => showMode("time")}
+          >
+            <Text>Select Time</Text>
+          </TouchableOpacity>
+
+          <StatusBar style="auto" />
+        </View>
+        <View>
+          <Text>{date.toLocaleString()}</Text>
         </View>
 
         <TouchableOpacity style={styles.SearchBtn}>
-            <Text style={styles.SearchBtnText}>Search</Text>
+          <Text style={styles.SearchBtnText}>Search</Text>
         </TouchableOpacity>
-     </View>
-      
-      
+      </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default HomeTab
+export default HomeTab;
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        //justifyContent: 'center',
-       },
-    
-    image: {
-        marginBottom: 2,
-        height:"40%",
-        width:"80%",
-    
-    },   
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+  },
 
-    inputcontainer:{
-        width:"90%",
-        alignItems:"center",
-        backgroundColor:"#ECF0F1",
-        borderRadius:20,
-    },
-    InputView:{
-        backgroundColor: "#ECF0F1",
-        borderBottomStyle:'solid',
-        borderBottomWidth:1,
-        //borderRadius: 30,
-        width: "70%",
-        height: 45,
-        //marginTop: 10,
-        //marginLeft:"15%",
-        alignItems: "center",
-    },
-    TextInput:{
-        height: 60,
-        flex: 1,
-        padding: 10,
-        //marginLeft: 20,
-        width:"80%",
-        alignItems: "center",
-        fontSize:20,
-      },
-      datePicker:{
-        width:"50%",
-        marginTop:20,
-        marginBottom:10,
-        //flex:1,
+  image: {
+    marginBottom: 2,
+    height: "40%",
+    width: "80%",
+  },
 
-      },
-      pickDateButton: {
-        width: "100%",
-        borderRadius: 1,
-        height: 50,
-        alignItems: "center",
-        justifyContent: "center",
-        marginTop: 20,
-        backgroundColor: "#FCF3CF",
-      },
-      pickDateText:{
-        fontWeight:'bold',
-      }, 
-      SearchBtn: {
-        width: "50%",
-        borderRadius: 25,
-        height: 50,
-        alignItems: "center",
-        justifyContent: "center",
-        marginTop: 5,
-        marginBottom:10,
-        backgroundColor: "#E6C700",
-      },
-      SearchBtnText:{
-        fontWeight:'bold',
-        fontSize:20,
-      },
-      
+  inputcontainer: {
+    width: "90%",
+    alignItems: "center",
+    backgroundColor: "#ECF0F1",
+    borderRadius: 20,
+    justifyContent: "center",
+  },
+  InputView: {
+    backgroundColor: "#ECF0F1",
+    borderBottomStyle: "solid",
+    borderBottomWidth: 1,
+    width: "70%",
+    height: 45,
+    alignItems: "center",
+  },
+  TextInput: {
+    height: 60,
+    flex: 1,
+    padding: 10,
+    width: "80%",
+    alignItems: "center",
+    fontSize: 20,
+  },
+  datePicker: {
+    width: "50%",
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  pickDateView: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  pickDateButton: {
+    width: "30%",
+    borderRadius: 25,
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
+    backgroundColor: "#FCF3CF",
+  },
+  pickDateText: {
+    fontWeight: "bold",
+  },
+  SearchBtn: {
+    width: "50%",
+    borderRadius: 25,
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 40,
+    marginBottom: 10,
+    backgroundColor: "#E6C700",
+  },
+  SearchBtnText: {
+    fontWeight: "bold",
+    fontSize: 20,
+  },
 });
