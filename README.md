@@ -1,6 +1,5 @@
 # Bus-Pass-Qr-coded
 
-
 ## Description
 
 The QR Code Bus Pass App streamlines the process of purchasing and using bus passes. It allows users to create accounts, search for buses based on route and date/time preferences, and securely add credit card details for payments.
