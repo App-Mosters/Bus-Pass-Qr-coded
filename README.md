@@ -1,5 +1,5 @@
 # Bus-Pass-Qr-coded
-After Qr code
+
 
 ## Description
 
