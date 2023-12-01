@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
-import { auth } from "../firebase";
+import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput } from "react-native";
+import { auth, db } from "../firebase";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -10,15 +10,22 @@ import * as ImagePicker from "expo-image-picker";
 const ProfileTab = () => {
   const navigation = useNavigation();
 
+  // State variables to store user information
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
   const [image, setImage] = useState(null);
+  const [name, setName] = useState("");
+  const [location, setLocation] = useState("");
+  const [bio, setBio] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   useEffect(() => {
+    // Check and request gallery permissions
     (async () => {
       const galleryStatus =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
       setHasGalleryPermission(galleryStatus.status === "granted");
 
+      // Retrieve and set saved profile image
       const savedImage = await AsyncStorage.getItem("profileImage");
       if (savedImage) {
         setImage(savedImage);
@@ -32,6 +39,7 @@ const ProfileTab = () => {
       return;
     }
 
+    // Launch image picker
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -41,9 +49,28 @@ const ProfileTab = () => {
 
     console.log(result);
 
+    // Update profile image if an image is selected
     if (!result.cancelled) {
       setImage(result.uri);
       await AsyncStorage.setItem("profileImage", result.uri);
+    }
+  };
+
+  const saveProfile = async () => {
+    const userId = auth.currentUser?.uid;
+
+    try {
+      // Update Firestore with user profile details
+      await db.collection('profiles').doc(userId).set({
+        name,
+        location,
+        bio,
+        // Add more fields for other user information
+      });
+
+      console.log('Profile updated successfully');
+    } catch (error) {
+      console.error('Error updating profile:', error);
     }
   };
 
@@ -56,6 +83,7 @@ const ProfileTab = () => {
       })
       .catch((error) => alert(error.message));
   };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -78,15 +106,40 @@ const ProfileTab = () => {
             size={24}
           />
         </TouchableOpacity>
-        <Text style={styles.name}>User</Text>
-        <Text style={styles.location}>Colombo, Sri Lanka </Text>
+        <Text style={styles.name}>{name || 'User'}</Text>
+        <Text style={styles.location}>{location || 'Colombo, Sri Lanka'}</Text>
       </View>
       <View style={styles.info}>
         <Text style={styles.label}>Email: {auth.currentUser?.email}</Text>
+        
         <Text style={styles.label}>Phone:</Text>
-        <Text style={styles.value}>(+94) </Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter Phone Number"
+          keyboardType="numeric"
+          value={phoneNumber}
+          onChangeText={(text) => setPhoneNumber(text)}
+        />
+
         <Text style={styles.label}>Bio:</Text>
-        <Text style={styles.value}>Enter Bio</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter Bio"
+          value={bio}
+          onChangeText={(text) => setBio(text)}
+        />
+
+        <Text style={styles.label}>Location:</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter Location"
+          value={location}
+          onChangeText={(text) => setLocation(text)}
+        />
+
+        <TouchableOpacity onPress={saveProfile} style={styles.saveButton}>
+          <Text style={styles.saveButtonText}>Save Profile</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
           <Text style={styles.logoutButtonText}>Log Out</Text>
@@ -155,4 +208,27 @@ const styles = StyleSheet.create({
   logoutButtonText: {
     fontWeight: "bold",
   },
+
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingLeft: 10,
+    borderRadius: 5,
+  },
+
+  saveButton: {
+    backgroundColor: "#3498db",
+    borderRadius: 25,
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
+  },
+  saveButtonText: {
+    fontWeight: "bold",
+    color: "#fff",
+  },
 });
+
