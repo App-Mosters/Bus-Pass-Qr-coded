@@ -3,17 +3,38 @@ import React,{useState} from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../firebase';
 
-
-
 const SignUp = () => {
     const [name, setName]= useState('');
     const [phoneNum, setPhoneNum]= useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmpassword, setConfirmpassword] = useState('');
+    const [phoneNumError, setPhoneNumError] = useState('');
     const navigation = useNavigation();
 
+    // Function to handle phone number input and validation
+    const handlePhoneNumChange = (input) => {
+      const cleaned = input.replace(/[^0-9]/g, '');
+     
+      // Validate if the phone number contains only numbers
+      if (cleaned !== input) {
+        setPhoneNumError('Phone number should only contain numbers');
+        alert('Phone number should only contain numbers');
+      } else {
+        setPhoneNumError('');
+      }
+      setPhoneNum(cleaned);
+    };
+
     const handleSignUp = () => {
+      
+      // Check if all required fields are filled
+      if (!name || !phoneNum || !email || !password ) {
+        alert("Please fill in all fields");
+        return; 
+      }
+      
+      
       if (password !== confirmpassword) {
         alert("Passwords do not match");
         return;
