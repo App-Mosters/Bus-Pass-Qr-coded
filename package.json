@@ -22,7 +22,7 @@
     "expo-barcode-scanner": "~12.5.3",
     "expo-image-picker": "~14.3.2",
     "expo-status-bar": "~1.6.0",
-    "firebase": "^10.6.0",
+    "firebase": "^10.7.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.8.0",
@@ -41,7 +41,8 @@
     "react-native-toast-message": "^2.1.7",
     "react-native-web": "~0.19.6",
     "react-toastify": "^9.1.3",
-    "reanimated-bottom-sheet": "^1.0.0-alpha.22"
+    "reanimated-bottom-sheet": "^1.0.0-alpha.22",
+    "validator": "^13.11.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"
