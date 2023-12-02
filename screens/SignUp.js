@@ -11,9 +11,31 @@ const SignUp = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmpassword, setConfirmpassword] = useState('');
+    const [phoneNumError, setPhoneNumError] = useState('');
     const navigation = useNavigation();
 
+    // Function to handle phone number input and validation
+    const handlePhoneNumChange = (input) => {
+      const cleaned = input.replace(/[^0-9]/g, '');
+     
+      // Validate if the phone number contains only numbers
+      if (cleaned !== input) {
+        setPhoneNumError('Phone number should only contain numbers');
+        alert('Phone number should only contain numbers');
+      } else {
+        setPhoneNumError('');
+      }
+      setPhoneNum(cleaned);
+    };
+
     const handleSignUp = () => {
+
+      // Check if all required fields are filled
+      if (!name || !phoneNum || !email || !password ) {
+        alert("Please fill in all fields");
+        return;
+      }
+      
       if (password !== confirmpassword) {
         alert("Passwords do not match");
         return;
@@ -43,10 +65,11 @@ const SignUp = () => {
         <View style={styles.InputView}>
             <TextInput
               style={styles.TextInput}
-              placeholder="Phone Number"
+              placeholder="Phone Number (+94) xxxxxxxxx"
               placeholderTextColor="#003f5c"
               keyboardType="numeric"
-              onChangeText={(phoneNum) => setPhoneNum(phoneNum)}
+              maxLength={9}
+              onChangeText={handlePhoneNumChange}
             /> 
         </View>
 
