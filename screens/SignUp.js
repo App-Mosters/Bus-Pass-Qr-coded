@@ -2,6 +2,7 @@ import { StyleSheet, Text, View,SafeAreaView,TextInput,TouchableOpacity,Image } 
 import React,{useState} from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../firebase';
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 
 
@@ -14,6 +15,7 @@ const SignUp = () => {
     const [phoneNumError, setPhoneNumError] = useState('');
     const [passwordStrength, setPasswordStrength] = useState('');
     const [showPasswordNote, setShowPasswordNote] = useState(true);
+    const [showPassword, setShowPassword] = useState(false);
     const navigation = useNavigation();
 
     // Function to handle phone number input and validation
@@ -108,13 +110,24 @@ const SignUp = () => {
           style={styles.TextInput}
           placeholder="Password"
           placeholderTextColor="#003f5c"
-          secureTextEntry={true}
+          secureTextEntry={!showPassword}
           onChangeText={(password) => {
             setPassword(password);
             checkPasswordStrength(password); 
           }}
         /> 
-        </View>
+        {/* Password visibility toggle button */}
+        <TouchableOpacity
+          style={{ position: 'absolute', right: 10 }}
+          onPress={() => setShowPassword(!showPassword)}
+        >
+          <MaterialCommunityIcons
+            name={showPassword ? 'eye' : 'eye-off'}
+            size={24}
+            color="black"
+          />
+        </TouchableOpacity>
+      </View>
 
          {/* Display password strength indicator */}
       {passwordStrength !== '' && (
