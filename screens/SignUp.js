@@ -3,7 +3,8 @@ import React,{useState} from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../firebase';
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const SignUp = () => {
@@ -69,9 +70,17 @@ const SignUp = () => {
           const user = userCredential.user;
           console.log('Successfully created a new account:',user.email);
         })
-        .catch((error) => alert(error.message));
-    };
-    
+
+        .catch((error) => {
+          // Display error message using react-toastify
+          toast.error(`Error: ${error.message}`, {
+            position: toast.POSITION.BOTTOM_CENTER,
+            autoClose: 5000, 
+            hideProgressBar: true, 
+            closeOnClick: true, 
+            pauseOnHover: true, 
+          });
+        });};
 
   return (
     <SafeAreaView style={styles.container}>
@@ -159,9 +168,11 @@ const SignUp = () => {
         <TouchableOpacity onPress={handleSignUp}style={styles.SignUpbtn}>
           <Text style={styles.SignUpText}>Sign Up</Text>
         </TouchableOpacity>
-    </SafeAreaView>
-  )
-}
+
+        {/* Include ToastContainer to render toast messages */}
+        <ToastContainer />
+        </SafeAreaView>
+        );}
 
 export default SignUp;
 
