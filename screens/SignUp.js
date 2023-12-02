@@ -12,6 +12,8 @@ const SignUp = () => {
     const [password, setPassword] = useState('');
     const [confirmpassword, setConfirmpassword] = useState('');
     const [phoneNumError, setPhoneNumError] = useState('');
+    const [passwordStrength, setPasswordStrength] = useState('');
+    const [showPasswordNote, setShowPasswordNote] = useState(true);
     const navigation = useNavigation();
 
     // Function to handle phone number input and validation
@@ -27,6 +29,24 @@ const SignUp = () => {
       }
       setPhoneNum(cleaned);
     };
+
+    // Function to check password strength
+  const checkPasswordStrength = (password) => {
+    const minLength = 6;
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasLowercase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChars = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    // Calculate strength based on conditions
+    if (password.length < minLength) {
+      setPasswordStrength('Weak');
+    } else if (hasUppercase && hasLowercase && hasNumbers && hasSpecialChars) {
+      setPasswordStrength('Strong');
+    } else {
+      setPasswordStrength('Medium');
+    }
+  };
 
     const handleSignUp = () => {
 
@@ -89,9 +109,27 @@ const SignUp = () => {
           placeholder="Password"
           placeholderTextColor="#003f5c"
           secureTextEntry={true}
-          onChangeText={(password) => setPassword(password)}
+          onChangeText={(password) => {
+            setPassword(password);
+            checkPasswordStrength(password); 
+          }}
         /> 
         </View>
+
+         {/* Display password strength indicator */}
+      {passwordStrength !== '' && (
+        <Text style={{ marginTop: 5 }}>
+          Password Strength: {passwordStrength}
+        </Text>
+      )}
+
+       {/* Display password usage note */}
+       {showPasswordNote && (
+        <Text style={{ color: 'gray', fontSize: 12, marginTop: 5 }}>
+          Password should be at least 6 characters long and include
+          uppercase, lowercase, numbers, and special characters.
+        </Text>
+      )}
 
         <View style={styles.InputView}>
         <TextInput
@@ -99,6 +137,8 @@ const SignUp = () => {
           placeholder="Confirm Password"
           placeholderTextColor="#003f5c"
           secureTextEntry={true}
+          onFocus={() => setShowPasswordNote(true)} 
+          onBlur={() => setShowPasswordNote(false)}
           onChangeText={(confirmpassword) => setConfirmpassword(confirmpassword)}
         /> 
         </View>
