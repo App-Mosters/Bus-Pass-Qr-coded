@@ -5,21 +5,23 @@ import {
   TextInput,
   Image,
   TouchableOpacity,
-} from "react-native";
-import React, { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
-import { auth } from "../firebase";
+} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { auth } from '../firebase';
+import { Ionicons } from '@expo/vector-icons'; // Assuming you have Ionicons installed
 
 const SignIn = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        navigation.replace("Bus Mate");
+        navigation.replace('Bus Mate');
       }
     });
 
@@ -31,25 +33,26 @@ const SignIn = () => {
       .signInWithEmailAndPassword(email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        console.log("Successfully signed in:", user.email);
+        console.log('Successfully signed in:', user.email);
       })
       .catch((error) => alert(error.message));
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <Image style={styles.image} source={require("../assets/bus.png")} />
+      <Image style={styles.image} source={require('../assets/bus.png')} />
 
       <View style={styles.SignUp}>
         <Text style={styles.SignUpQ}>Don't have an Account? </Text>
         <TouchableOpacity
-          onPress={() => navigation.navigate("Sign Up")}
+          onPress={() => navigation.navigate('Sign Up')}
           style={styles.SignUpBtn}
         >
           <Text style={styles.SignUpTxt}> SignUp</Text>
         </TouchableOpacity>
       </View>
 
+      {/* Email Input */}
       <View style={styles.inputView}>
         <TextInput
           style={styles.TextInput}
@@ -62,6 +65,7 @@ const SignIn = () => {
         />
       </View>
 
+      {/* Password Input with Toggle Icon */}
       <View style={styles.inputView}>
         <TextInput
           style={styles.TextInput}
@@ -69,16 +73,29 @@ const SignIn = () => {
           placeholderTextColor="#003f5c"
           value={password}
           onChangeText={(text) => setPassword(text)}
-          secureTextEntry={true}
+          secureTextEntry={!showPassword}
         />
+        {/* Password visibility toggle button */}
+        <TouchableOpacity
+          style={styles.toggleIcon}
+          onPress={() => setShowPassword(!showPassword)}
+        >
+          <Ionicons
+            name={showPassword ? 'eye-off' : 'eye'}
+            size={24}
+            color="black"
+          />
+        </TouchableOpacity>
       </View>
 
+      {/* Forgot Password Link */}
       <TouchableOpacity
-        onPress={() => navigation.navigate("ForgotPasswordInitiate")}
+        onPress={() => navigation.navigate('ForgotPasswordInitiate')}
       >
         <Text style={styles.forgot_button}>Forgot Password?</Text>
       </TouchableOpacity>
 
+      {/* Sign In Button */}
       <TouchableOpacity onPress={handleSignIn} style={styles.SignInbtn}>
         <Text style={styles.SignInText}>Sign In</Text>
       </TouchableOpacity>
@@ -89,14 +106,14 @@ const SignIn = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
+    backgroundColor: '#fff',
+    alignItems: 'center',
   },
 
   image: {
     marginBottom: 10,
-    height: "40%",
-    width: "80%",
+    height: '40%',
+    width: '80%',
   },
 
   SignUp: {
@@ -104,22 +121,23 @@ const styles = StyleSheet.create({
   },
 
   SignUpBtn: {
-    alignItems: "center",
+    alignItems: 'center',
   },
 
   SignUpTxt: {
     fontSize: 14,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
 
   inputView: {
-    backgroundColor: "#fff",
-    borderBottomStyle: "solid",
+    flexDirection: 'row', // Display TextInput and Toggle Icon in a row
+    backgroundColor: '#fff',
+    borderBottomStyle: 'solid',
     borderBottomWidth: 1,
-    width: "70%",
+    width: '70%',
     height: 45,
     marginBottom: 20,
-    alignItems: "center",
+    alignItems: 'center',
   },
 
   TextInput: {
@@ -127,27 +145,32 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     marginLeft: 20,
-    border: "dotted",
+    border: 'dotted',
+  },
+
+  toggleIcon: {
+    position: 'absolute',
+    right: 10,
   },
 
   forgot_button: {
     height: 30,
     marginBottom: 10,
-    color: "blue",
+    color: 'blue',
   },
 
   SignInbtn: {
-    width: "80%",
+    width: '80%',
     borderRadius: 25,
     height: 50,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
-    backgroundColor: "#E6C700",
+    backgroundColor: '#E6C700',
   },
 
   SignInText: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
 });
 
