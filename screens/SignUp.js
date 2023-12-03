@@ -1,10 +1,8 @@
-import { StyleSheet, Text, View, SafeAreaView, TextInput, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../firebase';
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 const SignUp = () => {
   const [name, setName] = useState('');
@@ -53,34 +51,27 @@ const SignUp = () => {
   const handleSignUp = () => {
     // Check if all required fields are filled
     if (!name || !phoneNum || !email || !password) {
-      alert("Please fill in all fields");
+      Alert.alert("Error", "Please fill in all fields");
       return;
     }
-
+  
     if (password !== confirmpassword) {
-      alert("Passwords do not match");
+      Alert.alert("Error", "Passwords do not match");
       return;
     }
-
+  
     auth
       .createUserWithEmailAndPassword(email, password)
       .then((userCredential) => {
         const user = userCredential.user;
         console.log('Successfully created a new account:', user.email);
       })
-
       .catch((error) => {
-        // Display error message using react-toastify
-        toast.error(`Error: ${error.message}`, {
-          position: toast.POSITION.BOTTOM_CENTER,
-          autoClose: 5000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-        });
+        // Display error message using Alert
+        Alert.alert("Error", error.message);
       });
   };
-
+  
   return (
     <SafeAreaView style={styles.container}>
       <Image style={styles.image} source={require("../assets/Welcome.gif")} />
@@ -190,9 +181,6 @@ const SignUp = () => {
       <TouchableOpacity onPress={handleSignUp} style={styles.SignUpbtn}>
         <Text style={styles.SignUpText}>Sign Up</Text>
       </TouchableOpacity>
-
-      {/* Include ToastContainer to render toast messages */}
-      <ToastContainer />
     </SafeAreaView>
   );
 };
@@ -212,25 +200,21 @@ const styles = StyleSheet.create({
     marginTop: 20,
     height: "30%",
     width: "80%",
-
   },
   InputView: {
     backgroundColor: "#fff",
     borderBottomStyle: 'solid',
     borderBottomWidth: 1,
-    //borderRadius: 30,
     width: "70%",
     height: 45,
     marginTop: 10,
-    //marginLeft:"15%",
     alignItems: "center",
-    flexDirection: 'row', // Added flexDirection for horizontal alignment
+    flexDirection: 'row',
   },
   TextInput: {
     height: 50,
     flex: 1,
     padding: 10,
-    //marginLeft: 20,
     width: "80%",
     alignItems: "center",
   },
@@ -249,6 +233,6 @@ const styles = StyleSheet.create({
   },
 
   iconContainer: {
-    marginRight: 10, // Adjust this value based on your preference
+    marginRight: 10,
   },
 });
