@@ -30,33 +30,103 @@ const SignUp = () => {
     setPhoneNum(cleaned);
   };
 
-  // Function to check password strength
   const checkPasswordStrength = (password) => {
     const minLength = 6;
     const hasUppercase = /[A-Z]/.test(password);
     const hasLowercase = /[a-z]/.test(password);
     const hasNumbers = /\d/.test(password);
     const hasSpecialChars = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
-    // Calculate strength based on conditions
+  
+    // Create an array to store the missing criteria
+    const missingCriteria = [];
+  
+    // Check each criteria and populate the missingCriteria array
     if (password.length < minLength) {
-      setPasswordStrength('Weak');
-    } else if (hasUppercase && hasLowercase && hasNumbers && hasSpecialChars) {
+      missingCriteria.push('at least 6 characters');
+    }
+    if (!hasUppercase) {
+      missingCriteria.push('an uppercase letter');
+    }
+    if (!hasLowercase) {
+      missingCriteria.push('a lowercase letter');
+    }
+    if (!hasNumbers) {
+      missingCriteria.push('a number');
+    }
+    if (!hasSpecialChars) {
+      missingCriteria.push('a special character');
+    }
+  
+    // Generate the password strength message based on missing criteria
+    if (missingCriteria.length === 0) {
       setPasswordStrength('Strong');
+    } else if (missingCriteria.length <= 2) {
+      setPasswordStrength('Medium (missing: ' + missingCriteria.join(', ') + ')');
     } else {
-      setPasswordStrength('Medium');
+      setPasswordStrength('Weak (missing: ' + missingCriteria.join(', ') + ')');
     }
   };
+  
 
   const handleSignUp = () => {
     // Check if all required fields are filled
     if (!name || !phoneNum || !email || !password) {
-      Alert.alert("Error", "Please fill in all fields");
+      Alert.alert('WARNING!',
+      'Please fill in all fields',
+      [
+      {
+        text: 'Do not show again',
+        onPress: () => console.warn('Do not show Pressed!')
+      },
+      {
+        text: 'Cancel',
+        onPress: () => console.warn('Cancel Pressed!')
+      },
+      {
+        text: 'OK',
+        onPress: () => console.warn('OK Pressed!')
+      },
+    ],);
       return;
     }
+
   
     if (password !== confirmpassword) {
-      Alert.alert("Error", "Passwords do not match");
+      Alert.alert('WARNING!', 'Passwords do not match',
+      [
+        {
+          text: 'Do not show again',
+          onPress: () => console.warn('Do not show Pressed!')
+        },
+        {
+          text: 'Cancel',
+          onPress: () => console.warn('Cancel Pressed!')
+        },
+        {
+          text: 'OK',
+          onPress: () => console.warn('OK Pressed!')
+        },
+      ],);
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert('Invalid Email', 'Please enter a valid email address',
+      [
+        {
+          text: 'Do not show again',
+          onPress: () => console.warn('Do not show Pressed!')
+        },
+        {
+          text: 'Cancel',
+          onPress: () => console.warn('Cancel Pressed!')
+        },
+        {
+          text: 'OK',
+          onPress: () => console.warn('OK Pressed!')
+        },
+      ],);
       return;
     }
   
@@ -67,10 +137,10 @@ const SignUp = () => {
         console.log('Successfully created a new account:', user.email);
       })
       .catch((error) => {
-        // Display error message using Alert
-        Alert.alert("Error", error.message);
+
       });
   };
+
   
   return (
     <SafeAreaView style={styles.container}>
