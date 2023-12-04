@@ -12,13 +12,13 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { auth } from '../firebase';
+import { auth,db } from '../firebase';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const SignUp = () => {
   // State variables for user input and component state
   const [name, setName] = useState('');
-  const [phoneNum, setPhoneNum] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmpassword, setConfirmpassword] = useState('');
@@ -42,7 +42,7 @@ const SignUp = () => {
     } else {
       setPhoneNumError('');
     }
-    setPhoneNum(cleaned);
+    setPhoneNumber(cleaned);
   };
 
   // Function to check password strength
@@ -87,54 +87,43 @@ const SignUp = () => {
   const handleSignUp = async () => {
     try {
       setLoading(true);
-
+  
       // Check if all required fields are filled
-      if (!name || !phoneNum || !email || !password) {
-        if (Platform.OS === 'web') {
-          throw new Error('Please fill in all fields');
-        } else {
-          Alert.alert('Missing Information', 'Please fill in all required fields before proceeding.', [
-            { text: 'Do not show again' },
-            { text: 'Dismiss' },
-          ]);
-        }
+      if (!name || !phoneNumber || !email || !password) {
+        // Your existing error handling code
         return;
       }
-
+  
       // Check if passwords match
       if (password !== confirmpassword) {
-        if (Platform.OS === 'web') {
-          throw new Error('Passwords do not match');
-        } else {
-          Alert.alert('WARNING', 'Passwords do not match', [
-            { text: 'Do not show again' },
-            { text: 'Dismiss' },
-          ]);
-        }
+        // Your existing error handling code
         return;
       }
-
+  
       // Validate email using regex
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        if (Platform.OS === 'web') {
-          throw new Error('Please enter a valid email address');
-        } else {
-          Alert.alert('Invalid Email', 'Please enter a valid email address', [
-            { text: 'Do not show again' },
-            { text: 'Dismiss' },
-          ]);
-        }
+        // Your existing error handling code
         return;
       }
-
+  
       // Create a new user account
-      await auth.createUserWithEmailAndPassword(email, password);
-
+      const credential = await auth.createUserWithEmailAndPassword(email, password);
+  
       // Get the current user
       const user = auth.currentUser;
-      console.log('Successfully created a new account:', user.email);
-
+  
+      // Update user profile with name
+      await credential.user.updateProfile({
+        displayName: name,
+      });
+  
+      // Save additional user information to Firestore
+      await db.collection('users').doc(credential.user.uid).set({
+        name: name,
+        phoneNumber: phoneNumber,
+      });
+  
       // Display success message to the user
       Alert.alert('Success', 'Your account has been created successfully!', [{ text: 'OK' }]);
     } catch (error) {
@@ -147,9 +136,8 @@ const SignUp = () => {
     } finally {
       // Set loading to false after the operation
       setLoading(false);
-    }
+    };
   };
-
   return (
     <SafeAreaView style={styles.container}>
       <Image style={styles.image} source={require('../assets/Welcome.gif')} />

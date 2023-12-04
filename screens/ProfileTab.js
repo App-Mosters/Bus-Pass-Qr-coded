@@ -1,13 +1,32 @@
 import React, { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import * as ImagePicker from "expo-image-picker";
 
 const ProfileTab = () => {
+  const [name, setName] = useState('');
+  const [phoneNum, setPhoneNum] = useState('');
+
+  useEffect(() => {
+    const getUserInfo = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        // Retrieve additional user information from Firestore
+        const userDoc = await db.collection('users').doc(user.uid).get();
+
+        // Set the retrieved information in the state
+        setName(user.displayName);
+        setPhoneNum(userDoc.data()?.phoneNumber);
+      }
+    };
+
+    getUserInfo();
+  }, []);
+
   const navigation = useNavigation();
 
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
@@ -47,15 +66,32 @@ const ProfileTab = () => {
     }
   };
 
+    // Clear the stored image 
+  const resetProfileImage = async () => {
+    await AsyncStorage.removeItem("profileImage");
+    setImage(null);
+  };
+
   const handleLogout = () => {
     auth
       .signOut()
       .then(() => {
         console.log("logged out");
+        resetProfileImage(); // Reset dp when logged out
         navigation.replace("Sign In");
       })
       .catch((error) => alert(error.message));
   };
+
+  // const handleLogout = () => {
+  //   auth
+  //     .signOut()
+  //     .then(() => {
+  //       console.log("logged out");
+  //       navigation.replace("Sign In");
+  //     })
+  //     .catch((error) => alert(error.message));
+  // };
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -78,13 +114,13 @@ const ProfileTab = () => {
             size={24}
           />
         </TouchableOpacity>
-        <Text style={styles.name}>User</Text>
+        <Text style={styles.name}>{name}</Text>
         <Text style={styles.location}>Colombo, Sri Lanka </Text>
       </View>
       <View style={styles.info}>
         <Text style={styles.label}>Email: {auth.currentUser?.email}</Text>
-        <Text style={styles.label}>Phone:</Text>
-        <Text style={styles.value}>(+94) </Text>
+        <Text style={styles.label}>Phone: (+94) {phoneNum}</Text>
+
         <Text style={styles.label}>Bio:</Text>
         <Text style={styles.value}>Enter Bio</Text>
 
