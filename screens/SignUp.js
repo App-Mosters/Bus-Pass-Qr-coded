@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, SafeAreaView, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, TextInput, TouchableOpacity, Image, Alert, Platform } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../firebase';
@@ -14,6 +14,7 @@ const SignUp = () => {
   const [passwordStrength, setPasswordStrength] = useState('');
   const [showPasswordNote, setShowPasswordNote] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const navigation = useNavigation();
 
   // Function to handle phone number input and validation
@@ -36,11 +37,11 @@ const SignUp = () => {
     const hasLowercase = /[a-z]/.test(password);
     const hasNumbers = /\d/.test(password);
     const hasSpecialChars = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-  
+
     // Create an array to store the missing criteria
     const missingCriteria = [];
-  
-    // Check each criteria and populate the missingCriteria array
+
+    // Check each criterion and populate the missingCriteria array
     if (password.length < minLength) {
       missingCriteria.push('at least 6 characters');
     }
@@ -56,7 +57,7 @@ const SignUp = () => {
     if (!hasSpecialChars) {
       missingCriteria.push('a special character');
     }
-  
+
     // Generate the password strength message based on missing criteria
     if (missingCriteria.length === 0) {
       setPasswordStrength('Strong');
@@ -66,82 +67,75 @@ const SignUp = () => {
       setPasswordStrength('Weak (missing: ' + missingCriteria.join(', ') + ')');
     }
   };
+
+  const handleSignUp = async () => {
+    try {
+      // Check if all required fields are filled
+      if (!name || !phoneNum || !email || !password) {
+        if (Platform.OS === 'web') {
+          throw new Error('Please fill in all fields');
+        } else {
+          Alert.alert(
+            'Missing Information',
+            'Please fill in all required fields before proceeding.',
+            [
+              { text: 'Do not show again', onPress: () => console.warn('Do not show Pressed!') },
+              { text: 'Dismiss', onPress: () => console.warn('Dismiss Pressed!') },
+            ],
+          );
+        }
+        return;
+      }
   
-
-  const handleSignUp = () => {
-    // Check if all required fields are filled
-    if (!name || !phoneNum || !email || !password) {
-      Alert.alert('WARNING!',
-      'Please fill in all fields',
-      [
-      {
-        text: 'Do not show again',
-        onPress: () => console.warn('Do not show Pressed!')
-      },
-      {
-        text: 'Cancel',
-        onPress: () => console.warn('Cancel Pressed!')
-      },
-      {
-        text: 'OK',
-        onPress: () => console.warn('OK Pressed!')
-      },
-    ],);
-      return;
-    }
-
+      if (password !== confirmpassword) {
+        if (Platform.OS === 'web') {
+          throw new Error('Passwords do not match');
+        } else {
+          Alert.alert(
+            'WARNING',
+            'Passwords do not match',
+            [
+              { text: 'Do not show again' },
+              { text: 'Dismiss' },
+  ],
+          );
+        }
+        return;
+      }
   
-    if (password !== confirmpassword) {
-      Alert.alert('WARNING!', 'Passwords do not match',
-      [
-        {
-          text: 'Do not show again',
-          onPress: () => console.warn('Do not show Pressed!')
-        },
-        {
-          text: 'Cancel',
-          onPress: () => console.warn('Cancel Pressed!')
-        },
-        {
-          text: 'OK',
-          onPress: () => console.warn('OK Pressed!')
-        },
-      ],);
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      Alert.alert('Invalid Email', 'Please enter a valid email address',
-      [
-        {
-          text: 'Do not show again',
-          onPress: () => console.warn('Do not show Pressed!')
-        },
-        {
-          text: 'Cancel',
-          onPress: () => console.warn('Cancel Pressed!')
-        },
-        {
-          text: 'OK',
-          onPress: () => console.warn('OK Pressed!')
-        },
-      ],);
-      return;
-    }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        if (Platform.OS === 'web') {
+          throw new Error('Please enter a valid email address');
+        } else {
+          Alert.alert(
+            'Invalid Email',
+            'Please enter a valid email address',
+            [
+              { text: 'Do not show again', onPress: () => console.warn('Do not show Pressed!') },
+              { text: 'Dismiss', onPress: () => console.warn('Dismiss Pressed!') },
+  ],
+          );
+        }
+        return;
+      }
   
-    auth
-      .createUserWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        console.log('Successfully created a new account:', user.email);
-      })
-      .catch((error) => {
-
-      });
+      await auth.createUserWithEmailAndPassword(email, password);
+  
+      const user = auth.currentUser;
+      console.log('Successfully created a new account:', user.email);
+    } catch (error) {
+      if (Platform.OS === 'web') {
+        // Handle error for web (e.g., render error message within the component)
+        setErrorMessage(error.message);
+      } else {
+        // Handle error for mobile (e.g., display alert)
+        Alert.alert('Error', error.message, [{ text: 'OK', onPress: () => console.warn('OK Pressed!') }]);
+      }
+    }
   };
-
   
+
   return (
     <SafeAreaView style={styles.container}>
       <Image style={styles.image} source={require("../assets/Welcome.gif")} />
@@ -251,18 +245,22 @@ const SignUp = () => {
       <TouchableOpacity onPress={handleSignUp} style={styles.SignUpbtn}>
         <Text style={styles.SignUpText}>Sign Up</Text>
       </TouchableOpacity>
+
+      {/* Render error message for web */}
+      {errorMessage && Platform.OS === 'web' && (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
-
-export default SignUp;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    //justifyContent: 'center',
   },
 
   image: {
@@ -305,4 +303,16 @@ const styles = StyleSheet.create({
   iconContainer: {
     marginRight: 10,
   },
+
+  errorContainer: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: 'red',
+    borderRadius: 5,
+  },
+  errorText: {
+    color: 'white',
+  },
 });
+
+export default SignUp;
