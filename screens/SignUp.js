@@ -1,10 +1,22 @@
-import { StyleSheet, Text, View, SafeAreaView, TextInput, TouchableOpacity, Image, Alert, Platform } from 'react-native';
 import React, { useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  Alert,
+  Platform,
+  ActivityIndicator,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../firebase';
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const SignUp = () => {
+  // State variables for user input and component state
   const [name, setName] = useState('');
   const [phoneNum, setPhoneNum] = useState('');
   const [email, setEmail] = useState('');
@@ -15,6 +27,8 @@ const SignUp = () => {
   const [showPasswordNote, setShowPasswordNote] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+
   const navigation = useNavigation();
 
   // Function to handle phone number input and validation
@@ -31,6 +45,7 @@ const SignUp = () => {
     setPhoneNum(cleaned);
   };
 
+  // Function to check password strength
   const checkPasswordStrength = (password) => {
     const minLength = 6;
     const hasUppercase = /[A-Z]/.test(password);
@@ -68,77 +83,76 @@ const SignUp = () => {
     }
   };
 
+  // Function to handle sign-up process
   const handleSignUp = async () => {
     try {
+      setLoading(true);
+
       // Check if all required fields are filled
       if (!name || !phoneNum || !email || !password) {
         if (Platform.OS === 'web') {
           throw new Error('Please fill in all fields');
         } else {
-          Alert.alert(
-            'Missing Information',
-            'Please fill in all required fields before proceeding.',
-            [
-              { text: 'Do not show again', onPress: () => console.warn('Do not show Pressed!') },
-              { text: 'Dismiss', onPress: () => console.warn('Dismiss Pressed!') },
-            ],
-          );
+          Alert.alert('Missing Information', 'Please fill in all required fields before proceeding.', [
+            { text: 'Do not show again' },
+            { text: 'Dismiss' },
+          ]);
         }
         return;
       }
-  
+
+      // Check if passwords match
       if (password !== confirmpassword) {
         if (Platform.OS === 'web') {
           throw new Error('Passwords do not match');
         } else {
-          Alert.alert(
-            'WARNING',
-            'Passwords do not match',
-            [
-              { text: 'Do not show again' },
-              { text: 'Dismiss' },
-  ],
-          );
+          Alert.alert('WARNING', 'Passwords do not match', [
+            { text: 'Do not show again' },
+            { text: 'Dismiss' },
+          ]);
         }
         return;
       }
-  
+
+      // Validate email using regex
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         if (Platform.OS === 'web') {
           throw new Error('Please enter a valid email address');
         } else {
-          Alert.alert(
-            'Invalid Email',
-            'Please enter a valid email address',
-            [
-              { text: 'Do not show again', onPress: () => console.warn('Do not show Pressed!') },
-              { text: 'Dismiss', onPress: () => console.warn('Dismiss Pressed!') },
-  ],
-          );
+          Alert.alert('Invalid Email', 'Please enter a valid email address', [
+            { text: 'Do not show again' },
+            { text: 'Dismiss' },
+          ]);
         }
         return;
       }
-  
+
+      // Create a new user account
       await auth.createUserWithEmailAndPassword(email, password);
-  
+
+      // Get the current user
       const user = auth.currentUser;
       console.log('Successfully created a new account:', user.email);
+
+      // Display success message to the user
+      Alert.alert('Success', 'Your account has been created successfully!', [{ text: 'OK' }]);
     } catch (error) {
+      // Handle error (display on web or show alert on mobile)
       if (Platform.OS === 'web') {
-        // Handle error for web (e.g., render error message within the component)
         setErrorMessage(error.message);
       } else {
-        // Handle error for mobile (e.g., display alert)
         Alert.alert('Error', error.message, [{ text: 'OK', onPress: () => console.warn('OK Pressed!') }]);
       }
+    } finally {
+      // Set loading to false after the operation
+      setLoading(false);
     }
   };
-  
 
   return (
     <SafeAreaView style={styles.container}>
-      <Image style={styles.image} source={require("../assets/Welcome.gif")} />
+      <Image style={styles.image} source={require('../assets/Welcome.gif')} />
 
       {/* Name Input */}
       <View style={styles.InputView}>
@@ -204,7 +218,7 @@ const SignUp = () => {
         >
           <MaterialCommunityIcons
             name={showPassword ? 'eye' : 'eye-off'}
-            size={24}
+            size={20}
             color="black"
           />
         </TouchableOpacity>
@@ -212,9 +226,7 @@ const SignUp = () => {
 
       {/* Display password strength indicator */}
       {passwordStrength !== '' && (
-        <Text style={{ marginTop: 5 }}>
-          Password Strength: {passwordStrength}
-        </Text>
+        <Text style={{ marginTop: 5 }}>Password Strength: {passwordStrength}</Text>
       )}
 
       {/* Display password usage note */}
@@ -241,6 +253,10 @@ const SignUp = () => {
         />
       </View>
 
+      {/* Loading Indicator */}
+      {loading && <ActivityIndicator size="large" color="#E6C700" />}
+    
+
       {/* Sign Up Button */}
       <TouchableOpacity onPress={handleSignUp} style={styles.SignUpbtn}>
         <Text style={styles.SignUpText}>Sign Up</Text>
@@ -255,61 +271,73 @@ const SignUp = () => {
     </SafeAreaView>
   );
 };
-
 const styles = StyleSheet.create({
+  // Overall container styles
   container: {
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
   },
 
+  // Welcome image styles
   image: {
     marginBottom: 10,
     marginTop: 20,
-    height: "30%",
-    width: "80%",
+    height: '30%',
+    width: '80%',
   },
+
+  // Input container styles
   InputView: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     borderBottomStyle: 'solid',
     borderBottomWidth: 1,
-    width: "70%",
+    width: '70%',
     height: 45,
     marginTop: 10,
-    alignItems: "center",
+    alignItems: 'center',
     flexDirection: 'row',
   },
+
+  // Text input styles
   TextInput: {
     height: 50,
     flex: 1,
     padding: 10,
-    width: "80%",
-    alignItems: "center",
+    width: '80%',
+    alignItems: 'center',
   },
 
+  // Sign Up button styles
   SignUpbtn: {
-    width: "50%",
+    width: '50%',
     borderRadius: 25,
     height: 50,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 20,
-    backgroundColor: "#E6C700",
+    backgroundColor: '#E6C700',
   },
+  
+  // Sign Up button text styles
   SignUpText: {
     fontWeight: 'bold',
   },
 
+  // Icon container styles
   iconContainer: {
     marginRight: 10,
   },
 
+  // Error message container styles
   errorContainer: {
     marginTop: 10,
     padding: 10,
     backgroundColor: 'red',
     borderRadius: 5,
   },
+
+  // Error message text styles
   errorText: {
     color: 'white',
   },
