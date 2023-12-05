@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
-import { auth, db } from "../firebase";
+import { auth, db, storage } from "../firebase";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import * as ImagePicker from "expo-image-picker";
 
 const ProfileTab = () => {
   const [name, setName] = useState('');
   const [phoneNum, setPhoneNum] = useState('');
+  const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
+  const [image, setImage] = useState(null);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const getUserInfo = async () => {
@@ -21,29 +23,36 @@ const ProfileTab = () => {
         // Set the retrieved information in the state
         setName(user.displayName);
         setPhoneNum(userDoc.data()?.phoneNumber);
+
+        // Set profile image URL from Firestore
+        const profileImageURL = userDoc.data()?.profileImage;
+        if (profileImageURL) {
+          setImage(profileImageURL);
+          await AsyncStorage.setItem("profileImage", profileImageURL);
+        }
       }
     };
 
     getUserInfo();
   }, []);
 
-  const navigation = useNavigation();
-
-  const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
-  const [image, setImage] = useState(null);
-
   useEffect(() => {
     (async () => {
       const galleryStatus =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
       setHasGalleryPermission(galleryStatus.status === "granted");
-
-      const savedImage = await AsyncStorage.getItem("profileImage");
-      if (savedImage) {
-        setImage(savedImage);
+  
+      const user = auth.currentUser;
+      const userDoc = await db.collection('users').doc(user.uid).get();
+      const profileImageURL = userDoc.data()?.profileImage;
+  
+      if (profileImageURL) {
+        setImage(profileImageURL);
+        await AsyncStorage.setItem("profileImage", profileImageURL);
       }
     })();
   }, []);
+  
 
   const pickImage = async () => {
     if (!hasGalleryPermission) {
@@ -61,15 +70,33 @@ const ProfileTab = () => {
     console.log(result);
 
     if (!result.cancelled) {
-      setImage(result.uri);
-      await AsyncStorage.setItem("profileImage", result.uri);
-    }
-  };
+      const response = await fetch(result.uri);
+      const blob = await response.blob();
+      const user = auth.currentUser;
+      const imagePath = `profileImages/${user.uid}`;
 
-    // Clear the stored image 
-  const resetProfileImage = async () => {
-    await AsyncStorage.removeItem("profileImage");
-    setImage(null);
+      const uploadTask = storage.ref().child(imagePath).put(blob);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          // Handle progress if needed
+        },
+        (error) => {
+          console.error("Error uploading image to Firebase Storage:", error);
+        },
+        async () => {
+          const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+          setImage(downloadURL);
+          await AsyncStorage.setItem("profileImage", downloadURL);
+
+          // Update user document in Firestore with the download URL
+          await db.collection('users').doc(user.uid).update({
+            profileImage: downloadURL,
+          });
+        }
+      );
+    }
   };
 
   const handleLogout = () => {
@@ -77,25 +104,14 @@ const ProfileTab = () => {
       .signOut()
       .then(() => {
         console.log("logged out");
-        resetProfileImage(); // Reset dp when logged out
         navigation.replace("Sign In");
       })
       .catch((error) => alert(error.message));
   };
 
-  // const handleLogout = () => {
-  //   auth
-  //     .signOut()
-  //     .then(() => {
-  //       console.log("logged out");
-  //       navigation.replace("Sign In");
-  //     })
-  //     .catch((error) => alert(error.message));
-  // };
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        
         {image ? (
           <Image source={{ uri: image }} style={styles.profilePic} />
         ) : (
@@ -120,9 +136,6 @@ const ProfileTab = () => {
       <View style={styles.info}>
         <Text style={styles.label}>Email: {auth.currentUser?.email}</Text>
         <Text style={styles.label}>Phone: (+94) {phoneNum}</Text>
-
-        <Text style={styles.label}>Bio:</Text>
-        <Text style={styles.value}>Enter Bio</Text>
 
         <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
           <Text style={styles.logoutButtonText}>Log Out</Text>
@@ -170,11 +183,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 30,
     bottom: 20,
+
   },
   label: {
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
+    backgroundColor: "#fffdaf",
+    padding: 10,
+    borderRadius: 15,
   },
   value: {
     fontSize: 16,
