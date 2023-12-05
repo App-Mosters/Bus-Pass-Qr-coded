@@ -178,7 +178,6 @@ const styles = StyleSheet.create({
 
   signInButtonText: {
     fontWeight: 'bold',
-    color: '#fff',
   },
 });
 
