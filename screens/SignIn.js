@@ -13,21 +13,25 @@ import { auth } from '../firebase';
 import { Ionicons } from '@expo/vector-icons';
 
 const SignIn = () => {
+  // State variables for email, password, and password visibility
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
-
+  
+  // Effect to check if the user is already authenticated
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
+         // If user is authenticated, navigate to 'Bus Mate'
         navigation.replace('Bus Mate');
       }
     });
 
     return unsubscribe;
   }, []);
-
+  
+ // Function to handle the sign-in process
   const handleSignIn = () => {
     auth
       .signInWithEmailAndPassword(email, password)
@@ -40,8 +44,10 @@ const SignIn = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+   {/* Image component for displaying a bus image */}
       <Image style={styles.image} source={require('../assets/bus.png')} />
-
+  
+ {/* Container for sign-up text and button */}
       <View style={styles.signUpContainer}>
         <Text style={styles.signUpText}>Don't have an Account? </Text>
         <TouchableOpacity
@@ -95,7 +101,7 @@ const SignIn = () => {
         <Text style={styles.forgotButton}>Forgot Password?</Text>
       </TouchableOpacity>
 
-      {/* Sign In Button */}
+     {/* Sign In Button */}
       <TouchableOpacity onPress={handleSignIn} style={styles.signInButton}>
         <Text style={styles.signInButtonText}>Sign In</Text>
       </TouchableOpacity>
@@ -103,6 +109,7 @@ const SignIn = () => {
   );
 };
 
+// Styles for various components in the SignIn component
 const styles = StyleSheet.create({
   container: {
     flex: 1,
