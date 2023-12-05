@@ -15,6 +15,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { StatusBar } from "expo-status-bar";
 
 const HomeTab = () => {
+  
   // State variables to manage location, date, date/time picker visibility, and mode
   const [location, setLocation] = useState("");
   const [date, setDate] = useState(new Date());
@@ -35,6 +36,7 @@ const HomeTab = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+  
       // Image component for displaying a bus image 
       <Image style={styles.image} source={require("../assets/bus.png")} />
 
