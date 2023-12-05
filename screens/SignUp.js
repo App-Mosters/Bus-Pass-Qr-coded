@@ -90,20 +90,42 @@ const SignUp = () => {
   
       // Check if all required fields are filled
       if (!name || !phoneNumber || !email || !password) {
-        // Your existing error handling code
+        if (Platform.OS === 'web') {
+          throw new Error('Please fill in all fields');
+        } else {
+          Alert.alert('Missing Information', 'Please fill in all required fields before proceeding.', [
+            { text: 'Do not show again' },
+            { text: 'Dismiss' },
+          ]);
+        }
         return;
       }
   
       // Check if passwords match
       if (password !== confirmpassword) {
-        // Your existing error handling code
+        if (Platform.OS === 'web') {
+          throw new Error('Passwords do not match');
+        } else {
+          Alert.alert('WARNING', 'Passwords do not match', [
+            { text: 'Do not show again' },
+            { text: 'Dismiss' },
+          ]);
+        }
         return;
       }
   
       // Validate email using regex
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        // Your existing error handling code
+        if (Platform.OS === 'web') {
+          throw new Error('Please enter a valid email address');
+        } else {
+          Alert.alert('Invalid Email', 'Please enter a valid email address', [
+            { text: 'Do not show again' },
+            { text: 'Dismiss' },
+          ]);
+        }
+        
         return;
       }
   
