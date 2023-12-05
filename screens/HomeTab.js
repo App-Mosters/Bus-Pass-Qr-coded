@@ -15,16 +15,20 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { StatusBar } from "expo-status-bar";
 
 const HomeTab = () => {
+
+  // State variables for managing location, date, date/time picker visibility and mode
   const [location, setLocation] = useState("");
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
   const [mode, setMode] = useState("date");
-
+  
+ // Handler for date and time picker changes
   const onChange = (e, selectedDate) => {
     setDate(selectedDate);
     setShow(false);
   };
-
+  
+// Function to show the date/time picker
   const showMode = (modeToShow) => {
     setShow(true);
     setMode(modeToShow);
@@ -32,9 +36,14 @@ const HomeTab = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+  
+  {/* Image component for displaying a bus image */}
       <Image style={styles.image} source={require("../assets/bus.png")} />
-
+  
+ {/* Container for input fields and controls */}
       <View style={styles.inputcontainer}>
+  
+  {/* Input field for location */}
         <View style={styles.InputView}>
           <TextInput
             style={styles.TextInput}
@@ -43,11 +52,14 @@ const HomeTab = () => {
             onChangeText={(location) => setLocation(location)}
           />
         </View>
+
+      {/* Date and time picker buttons */}
         <View style={styles.pickDateView}>
           <TouchableOpacity
             style={styles.pickDateButton}
             onPress={() => showMode("date")}
           >
+          {/* Display date/time picker when 'show' is true */}
             {show && (
               <DateTimePicker
                 testID="dateTimePicker"
@@ -68,12 +80,16 @@ const HomeTab = () => {
             <Text>Select Time</Text>
           </TouchableOpacity>
 
+{/* Status bar for displaying app status */}
           <StatusBar style="auto" />
         </View>
         <View>
+
+      {/* Display selected date/time */}
           <Text>{date.toLocaleString()}</Text>
         </View>
 
+{/* Search button */}
         <TouchableOpacity style={styles.SearchBtn}>
           <Text style={styles.SearchBtnText}>Search</Text>
         </TouchableOpacity>
@@ -84,6 +100,7 @@ const HomeTab = () => {
 
 export default HomeTab;
 
+// Styles for various components in the HomeTab
 const styles = StyleSheet.create({
   container: {
     flex: 1,
