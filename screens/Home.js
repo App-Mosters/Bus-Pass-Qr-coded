@@ -6,6 +6,7 @@ import HomeTab from './HomeTab';
 import QrSCAN from './QrSCAN';
 import Wallet from './Wallet';
 
+// Main navigation component for the Home screen
 const Home = () => {
     const Tab = createBottomTabNavigator();
 
@@ -16,7 +17,8 @@ const Home = () => {
 
         );
       }
-      
+    
+  // Component for the Wallet screen      
       function Wallets() {
         return (
           //wallet screen code
@@ -25,7 +27,8 @@ const Home = () => {
          
         );
       }
-
+    
+// Component for the QR Scan screen
       function QRScan() {
         return (
           //Qr screen code
