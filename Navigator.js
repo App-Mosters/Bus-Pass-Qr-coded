@@ -13,7 +13,7 @@ import { NavigationContainer } from '@react-navigation/native';
 const Stack = createStackNavigator ();
 const Navigator = () => {
   return (
-    <NavigationContainer>
+    <NavigationContainer independent={true}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Sign In" component={SignIn}/>
           <Stack.Screen name="Sign Up" component={SignUp}/>
