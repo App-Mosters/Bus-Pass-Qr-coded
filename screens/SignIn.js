@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,11 +7,10 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../firebase';
-import { Ionicons } from '@expo/vector-icons'; // Assuming you have Ionicons installed
+import { Ionicons } from '@expo/vector-icons';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -42,22 +42,22 @@ const SignIn = () => {
     <SafeAreaView style={styles.container}>
       <Image style={styles.image} source={require('../assets/bus.png')} />
 
-      <View style={styles.SignUp}>
-        <Text style={styles.SignUpQ}>Don't have an Account? </Text>
+      <View style={styles.signUpContainer}>
+        <Text style={styles.signUpText}>Don't have an Account? </Text>
         <TouchableOpacity
           onPress={() => navigation.navigate('Sign Up')}
-          style={styles.SignUpBtn}
+          style={styles.signUpButton}
         >
-          <Text style={styles.SignUpTxt}> SignUp</Text>
+          <Text style={styles.signUpButtonText}>Sign Up</Text>
         </TouchableOpacity>
       </View>
 
       {/* Email Input */}
       <View style={styles.inputView}>
         <TextInput
-          style={styles.TextInput}
+          style={styles.textInput}
           placeholder="Email..."
-          placeholderTextColor="#003f5c"
+          placeholderTextColor="#A9A9A9"
           value={email}
           onChangeText={(text) => setEmail(text)}
           autoCapitalize="none"
@@ -68,9 +68,9 @@ const SignIn = () => {
       {/* Password Input with Toggle Icon */}
       <View style={styles.inputView}>
         <TextInput
-          style={styles.TextInput}
+          style={styles.textInput}
           placeholder="Password..."
-          placeholderTextColor="#003f5c"
+          placeholderTextColor="#A9A9A9"
           value={password}
           onChangeText={(text) => setPassword(text)}
           secureTextEntry={!showPassword}
@@ -83,7 +83,7 @@ const SignIn = () => {
           <Ionicons
             name={showPassword ? 'eye-off' : 'eye'}
             size={24}
-            color="black"
+            color="#A9A9A9"
           />
         </TouchableOpacity>
       </View>
@@ -92,12 +92,12 @@ const SignIn = () => {
       <TouchableOpacity
         onPress={() => navigation.navigate('ForgotPasswordInitiate')}
       >
-        <Text style={styles.forgot_button}>Forgot Password?</Text>
+        <Text style={styles.forgotButton}>Forgot Password?</Text>
       </TouchableOpacity>
 
       {/* Sign In Button */}
-      <TouchableOpacity onPress={handleSignIn} style={styles.SignInbtn}>
-        <Text style={styles.SignInText}>Sign In</Text>
+      <TouchableOpacity onPress={handleSignIn} style={styles.signInButton}>
+        <Text style={styles.signInButtonText}>Sign In</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -116,36 +116,43 @@ const styles = StyleSheet.create({
     width: '80%',
   },
 
-  SignUp: {
+  signUpContainer: {
     marginBottom: 20,
-  },
-
-  SignUpBtn: {
+    flexDirection: 'row',
     alignItems: 'center',
   },
 
-  SignUpTxt: {
+  signUpText: {
+    fontSize: 14,
+    color: '#A9A9A9',
+  },
+
+  signUpButton: {
+    alignItems: 'center',
+  },
+
+  signUpButtonText: {
     fontSize: 14,
     fontWeight: 'bold',
+    color: '#E6C700',
   },
 
   inputView: {
-    flexDirection: 'row', // Display TextInput and Toggle Icon in a row
+    flexDirection: 'row',
     backgroundColor: '#fff',
-    borderBottomStyle: 'solid',
     borderBottomWidth: 1,
+    borderBottomColor: '#A9A9A9',
     width: '70%',
     height: 45,
     marginBottom: 20,
     alignItems: 'center',
   },
 
-  TextInput: {
+  textInput: {
     height: 50,
     flex: 1,
     padding: 10,
     marginLeft: 20,
-    border: 'dotted',
   },
 
   toggleIcon: {
@@ -153,13 +160,13 @@ const styles = StyleSheet.create({
     right: 10,
   },
 
-  forgot_button: {
+  forgotButton: {
     height: 30,
     marginBottom: 10,
-    color: 'blue',
+    color: '#007BFF',
   },
 
-  SignInbtn: {
+  signInButton: {
     width: '80%',
     borderRadius: 25,
     height: 50,
@@ -169,8 +176,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#E6C700',
   },
 
-  SignInText: {
+  signInButtonText: {
     fontWeight: 'bold',
+    color: '#fff',
   },
 });
 
