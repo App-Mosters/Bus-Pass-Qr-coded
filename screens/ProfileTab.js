@@ -6,17 +6,20 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 
+// ProfileTab component for the user profile screen
 const ProfileTab = () => {
   const [name, setName] = useState('');
   const [phoneNum, setPhoneNum] = useState('');
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
   const [image, setImage] = useState(null);
   const navigation = useNavigation();
-
+  
+ // Fetch user information from Firestore and set state variables
   useEffect(() => {
     const getUserInfo = async () => {
       const user = auth.currentUser;
       if (user) {
+        
         // Retrieve additional user information from Firestore
         const userDoc = await db.collection('users').doc(user.uid).get();
 
@@ -35,7 +38,8 @@ const ProfileTab = () => {
 
     getUserInfo();
   }, []);
-
+  
+// Request gallery permissions on component mount
   useEffect(() => {
     (async () => {
       const galleryStatus =
@@ -53,7 +57,7 @@ const ProfileTab = () => {
     })();
   }, []);
   
-
+// Pick image from gallery and upload to Firebase Storage
   const pickImage = async () => {
     if (!hasGalleryPermission) {
       alert("Permission required");
@@ -80,6 +84,7 @@ const ProfileTab = () => {
       uploadTask.on(
         "state_changed",
         (snapshot) => {
+          
           // Handle progress if needed
         },
         (error) => {
@@ -98,7 +103,8 @@ const ProfileTab = () => {
       );
     }
   };
-
+  
+// Handle user logout
   const handleLogout = () => {
     auth
       .signOut()
@@ -147,6 +153,7 @@ const ProfileTab = () => {
 
 export default ProfileTab;
 
+// Styles for the ProfileTab component
 const styles = StyleSheet.create({
   container: {
     flex: 1,
