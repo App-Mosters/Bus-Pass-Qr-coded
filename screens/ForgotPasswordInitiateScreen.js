@@ -10,18 +10,21 @@ import {
 import validator from 'validator';
 import { auth } from '../firebase';
 
+// Component for initiating the password reset process
 const ForgotPasswordInitiateScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [isValidEmail, setIsValidEmail] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
+  
+ // Validates the email format
   const validateEmail = () => {
     const isValid = validator.isEmail(email);
     setIsValidEmail(isValid);
     return isValid;
   };
-
+  
+// Handles the password reset initiation
   const handleResetPassword = () => {
     setError(''); 
     if (validateEmail()) {
@@ -66,6 +69,7 @@ const ForgotPasswordInitiateScreen = ({ navigation }) => {
   );
 };
 
+// Styles for the component
 const styles = StyleSheet.create({
   container: {
     flex: 1,
