@@ -9,22 +9,29 @@ import {
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const Wallet = () => {
+  // State variables for card number, expiry date, and CVV
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [cvv, setCvv] = useState("");
 
+  // Function to handle the addition of a payment method
   const handleAddPaymentMethod = () => {
     // Add payment method logic here
   };
 
   return (
     <View style={styles.container}>
+      {/* Wallet Information Container */}
       <View style={styles.walletContainer}>
         <Text style={styles.walletTitle}>Your available balance</Text>
         <Text style={styles.walletBalance}>Rs 100.00</Text>
       </View>
+
+      {/* Payment Method Container */}
       <View style={styles.paymentContainer}>
         <Text style={styles.paymentTitle}>Add your Debit/Credit card</Text>
+
+        {/* Input Container for Card Number */}
         <View style={styles.inputContainer}>
           <MaterialCommunityIcons
             name="credit-card-outline"
@@ -39,6 +46,8 @@ const Wallet = () => {
             onChangeText={setCardNumber}
           />
         </View>
+
+        {/* Input Container for Expiry Date */}
         <View style={styles.inputContainer}>
           <MaterialCommunityIcons name="calendar" color="#aaa" size={24} />
           <TextInput
@@ -49,6 +58,8 @@ const Wallet = () => {
             onChangeText={setExpiryDate}
           />
         </View>
+
+        {/* Input Container for CVV */}
         <View style={styles.inputContainer}>
           <MaterialCommunityIcons name="lock-outline" color="#aaa" size={24} />
           <TextInput
@@ -59,6 +70,8 @@ const Wallet = () => {
             onChangeText={setCvv}
           />
         </View>
+
+        {/* Button to Add Payment Method */}
         <TouchableOpacity
           style={styles.addPaymentButton}
           onPress={handleAddPaymentMethod}
@@ -72,6 +85,7 @@ const Wallet = () => {
   );
 };
 
+// Styles for various components in the Wallet component
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -130,3 +144,4 @@ const styles = StyleSheet.create({
 });
 
 export default Wallet;
+
