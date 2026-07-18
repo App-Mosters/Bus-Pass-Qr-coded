@@ -178,6 +178,12 @@ eas build --profile preview --platform android
 
 ---
 
+# 📥 Download
+
+The latest Android APK is available under the GitHub **Releases** section.
+
+➡️ https://github.com/App-Mosters/Bus-Pass-Qr-coded/releases/latest
+
 # 📂 Project Structure
 
 ```
