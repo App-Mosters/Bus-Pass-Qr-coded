@@ -1,6 +1,7 @@
-// Importing necessary components from 'expo-status-bar' and 'react-native'.
+import 'react-native-gesture-handler';// Importing necessary components from 'expo-status-bar' and 'react-native'.
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+import 'fast-text-encoding';
 
 // Importing 'NavigationContainer' from '@react-navigation/native'.
 import { NavigationContainer } from '@react-navigation/native';

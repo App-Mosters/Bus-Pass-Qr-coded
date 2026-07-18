@@ -1,38 +1,43 @@
 {
   "expo": {
-    "name": "AwesomeProject",
-    "slug": "AwesomeProject",
+    "name": "Bus Pass QR",
+    "slug": "bus-pass-qr",
     "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true
-    },
+    "plugins": [
+     "./plugins/withJscVersionFix.js",
+     [
+       "expo-build-properties",
+       {
+         "android": {
+           "targetSdkVersion": 34,
+           "compileSdkVersion": 34
+         }
+       }
+     ]
+   ],
     "android": {
+      "package": "com.appmosters.buspassqr",
+      "permissions": [
+        "CAMERA"
+      ],
+      "jsEngine": "hermes",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+        "backgroundColor": "#ffffff"
       }
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
+    "ios": {
+      "bundleIdentifier": "com.appmosters.buspassqr",
+      "jsEngine": "hermes",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Camera access is needed to scan bus pass QR codes."
+      }
     },
     "extra": {
       "eas": {
-        "projectId": "8f3d598a-4599-4e4b-9564-acb6c7113192"
+        "projectId": "7403a56f-4771-4005-92cc-259cb6ccea3c"
       }
-    }
+    },
+    "owner": "mubashir_4" 
   }
 }

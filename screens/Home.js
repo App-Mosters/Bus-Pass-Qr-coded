@@ -1,10 +1,11 @@
 import React,{} from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ProfileTab from './ProfileTab';
 import HomeTab from './HomeTab';
 import QrSCAN from './QrSCAN';
 import Wallet from './Wallet';
+import MyPass from './MyPass';
 
 // Main navigation component for the Home screen
 const Home = () => {
@@ -49,9 +50,15 @@ const Home = () => {
         );
       }
 
+      function Pass() {
+  return <MyPass />;
+}
+
 
       
   return (
+
+
     
       <Tab.Navigator>
         <Tab.Screen 
@@ -93,6 +100,14 @@ const Home = () => {
               <MaterialCommunityIcons name="face-man-profile" color={color} size={size} />
               ),
             }}/>
+
+            <Tab.Screen
+  name="My Pass"
+  component={Pass}
+  options={{
+    tabBarLabel: 'My Pass',
+  }}
+/>
       
       </Tab.Navigator>
     

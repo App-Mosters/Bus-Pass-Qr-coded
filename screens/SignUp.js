@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { auth,db } from '../firebase';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const SignUp = () => {
   // State variables for user input and component state
@@ -144,6 +144,7 @@ const SignUp = () => {
       await db.collection('users').doc(credential.user.uid).set({
         name: name,
         phoneNumber: phoneNumber,
+        walletBalance: 0,
       });
   
       // Display success message to the user

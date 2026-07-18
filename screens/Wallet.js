@@ -1,96 +1,111 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   StyleSheet,
   Text,
   View,
-  TextInput,
   TouchableOpacity,
+  ActivityIndicator,
+  FlatList,
 } from "react-native";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { auth, db } from "../firebase";
+import { topUpWallet } from "../Lib/wallet";
+
+const TOP_UP_OPTIONS = [100, 500, 1000];
 
 const Wallet = () => {
-  // State variables for card number, expiry date, and CVV
-  const [cardNumber, setCardNumber] = useState("");
-  const [expiryDate, setExpiryDate] = useState("");
-  const [cvv, setCvv] = useState("");
+  const [balance, setBalance] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [transactions, setTransactions] = useState([]);
 
-  // Function to handle the addition of a payment method
-  const handleAddPaymentMethod = () => {
-    // Add payment method logic here
-  };
+  useEffect(() => {
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+
+    const unsubscribeUser = db
+      .collection("users")
+      .doc(uid)
+      .onSnapshot((doc) => {
+        setBalance(doc.data()?.walletBalance ?? 0);
+      });
+
+    const unsubscribeTxns = db
+      .collection("transactions")
+      .where("userId", "==", uid)
+      .orderBy("createdAt", "desc")
+      .limit(10)
+      .onSnapshot((snapshot) => {
+        setTransactions(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+      });
+
+    return () => {
+      unsubscribeUser();
+      unsubscribeTxns();
+    };
+  }, []);
+
+  const handleTopUp = useCallback(async (amount) => {
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+    setLoading(true);
+    try {
+      await topUpWallet(uid, amount);
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   return (
     <View style={styles.container}>
-      {/* Wallet Information Container */}
       <View style={styles.walletContainer}>
         <Text style={styles.walletTitle}>Your available balance</Text>
-        <Text style={styles.walletBalance}>Rs 100.00</Text>
+        <Text style={styles.walletBalance}>
+          {balance === null ? "..." : `Rs ${balance.toFixed(2)}`}
+        </Text>
       </View>
 
-      {/* Payment Method Container */}
       <View style={styles.paymentContainer}>
-        <Text style={styles.paymentTitle}>Add your Debit/Credit card</Text>
-
-        {/* Input Container for Card Number */}
-        <View style={styles.inputContainer}>
-          <MaterialCommunityIcons
-            name="credit-card-outline"
-            color="#aaa"
-            size={24}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Card Number"
-            keyboardType="numeric"
-            value={cardNumber}
-            onChangeText={setCardNumber}
-          />
+        <Text style={styles.paymentTitle}>Top up your wallet</Text>
+        <View style={styles.topUpRow}>
+          {TOP_UP_OPTIONS.map((amount) => (
+            <TouchableOpacity
+              key={amount}
+              style={styles.topUpButton}
+              onPress={() => handleTopUp(amount)}
+              disabled={loading}
+            >
+              <Text style={styles.topUpButtonText}>+Rs {amount}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
+        {loading && <ActivityIndicator style={{ marginTop: 10 }} />}
+      </View>
 
-        {/* Input Container for Expiry Date */}
-        <View style={styles.inputContainer}>
-          <MaterialCommunityIcons name="calendar" color="#aaa" size={24} />
-          <TextInput
-            style={styles.input}
-            placeholder="Expiry Date"
-            keyboardType="numeric"
-            value={expiryDate}
-            onChangeText={setExpiryDate}
-          />
-        </View>
-
-        {/* Input Container for CVV */}
-        <View style={styles.inputContainer}>
-          <MaterialCommunityIcons name="lock-outline" color="#aaa" size={24} />
-          <TextInput
-            style={styles.input}
-            placeholder="CVV"
-            keyboardType="numeric"
-            value={cvv}
-            onChangeText={setCvv}
-          />
-        </View>
-
-        {/* Button to Add Payment Method */}
-        <TouchableOpacity
-          style={styles.addPaymentButton}
-          onPress={handleAddPaymentMethod}
-        >
-          <Text style={styles.addPaymentButtonText}>
-            Add your payment method
-          </Text>
-        </TouchableOpacity>
+      <View style={styles.historyContainer}>
+        <Text style={styles.paymentTitle}>Recent activity</Text>
+        <FlatList
+          data={transactions}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.txnRow}>
+              <Text style={styles.txnType}>
+                {item.type === "topup" ? "Top-up" : "Fare"}
+              </Text>
+              <Text style={item.amount < 0 ? styles.txnNegative : styles.txnPositive}>
+                {item.amount < 0 ? "-" : "+"}Rs {Math.abs(item.amount).toFixed(2)}
+              </Text>
+            </View>
+          )}
+          ListEmptyComponent={<Text style={styles.emptyText}>No transactions yet</Text>}
+        />
       </View>
     </View>
   );
 };
 
-// Styles for various components in the Wallet component
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
+  container: { flex: 1, backgroundColor: "#fff" },
   walletContainer: {
     padding: 20,
     backgroundColor: "#00FF7F",
@@ -98,50 +113,30 @@ const styles = StyleSheet.create({
     borderBottomColor: "#ddd",
     alignItems: "center",
   },
-  walletTitle: {
-    fontSize: 24,
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  walletBalance: {
-    fontSize: 36,
-    fontWeight: "bold",
-    marginTop: 10,
-  },
-  paymentContainer: {
-    padding: 20,
-  },
-  paymentTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 10,
-    marginTop: 50,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  input: {
-    flex: 1,
-    marginLeft: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#aaa",
-    fontSize: 18,
-    paddingVertical: 5,
-  },
-  addPaymentButton: {
+  walletTitle: { fontSize: 24, color: "#fff", fontWeight: "bold" },
+  walletBalance: { fontSize: 36, fontWeight: "bold", marginTop: 10 },
+  paymentContainer: { padding: 20 },
+  paymentTitle: { fontSize: 20, fontWeight: "bold", marginBottom: 10 },
+  topUpRow: { flexDirection: "row", justifyContent: "space-between" },
+  topUpButton: {
     backgroundColor: "#1e90ff",
-    paddingVertical: 10,
-    borderRadius: 5,
-    alignItems: "center",
-    marginTop: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
   },
-  addPaymentButtonText: {
-    color: "#fff",
-    fontSize: 18,
+  topUpButtonText: { color: "#fff", fontWeight: "bold" },
+  historyContainer: { flex: 1, paddingHorizontal: 20 },
+  txnRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
   },
+  txnType: { fontSize: 16 },
+  txnPositive: { color: "green", fontWeight: "bold" },
+  txnNegative: { color: "red", fontWeight: "bold" },
+  emptyText: { color: "#999", marginTop: 10 },
 });
 
 export default Wallet;
-
